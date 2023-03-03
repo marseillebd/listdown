@@ -1,0 +1,64 @@
+body {
+  margin: 0px auto;
+  width: 90%;
+  max-width: 60em;
+}
+
+/************ Function ************/
+
+.save-state > * { display: none; }
+.save-state[data-state='saved'] .saved,
+.save-state[data-state='unsaved'] .unsaved,
+.save-state[data-state='saving'] .saving,
+.save-state[data-state='error'] .error
+  { display: unset; }
+
+/************ Style ************/
+
+body {
+  font-size: 14pt;
+}
+
+/* fix font size */
+textarea, button {
+  font-size: inherit;
+}
+
+/* colors */
+body {
+  background-color: #111;
+  color: #EEE;
+}
+textarea, button {
+  background-color: #222;
+  color: #EEE;
+  border: thin #444 solid;
+}
+a {
+  color: #59d;
+}
+
+/* Button Shape */
+button {
+  border: none;
+  border-radius: 5px;
+  padding: 10px;
+  margin: 5px;
+  line-height: 1.0;
+}
+
+/* Textarea Shape */
+.listdown textarea {
+  display: block;
+  margin: 5px;
+  width: calc(100% - 2*5px);
+  height: 80vh;
+  border-radius: 5px;
+  border-bottom-right-radius: 0px;
+}
+
+/* Save State Colors */
+.save-state .saved { color: #0a3; }
+.save-state .unsaved { color: #fb5; }
+.save-state .saving { color: #b8f; }
+.save-state .error { color: #d30; }

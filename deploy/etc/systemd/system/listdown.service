@@ -1,0 +1,9 @@
+[Unit]
+Description = okuno-info listdown server
+After = network.target
+[Service]
+ExecStart = /usr/lib/listdown/run.sh
+User = okuno
+Group = okuno
+[Install]
+WantedBy = multi-user.target

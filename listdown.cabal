@@ -1,0 +1,81 @@
+cabal-version: 3.0
+name: listdown
+version: 0.0.1.0
+-- synopsis: 
+-- description:
+category: @@@CATEGORY@@@
+homepage: https://github.com/Eric Demko/listdown
+bug-reports: https://github.com/Eric Demko/listdown/issues
+author: Eric Demko
+maintainer: zankoku.okuno@gmail.com
+copyright: 2023 Eric Demko
+license: BSD-3-Clause
+license-file: LICENSE
+extra-source-files: README.md, CHANGELOG.md
+
+source-repository head
+  type: git
+  location: https://github.com/Eric Demko/listdown
+
+library
+  hs-source-dirs: src
+  exposed-modules:
+    Listdown
+    Listdown.Text
+    Listdown.Types
+  -- other-modules:
+  build-depends:
+    , base >=4.11 && <4.18
+    , lucid >=2.11 && <2.12
+    , text >=2.0 && <2.1
+    , containers >=0.6 && <0.7
+  default-language: Haskell2010
+  ghc-options: -O2 -Wall -Wunticked-promoted-constructors
+
+executable listdown-server
+  hs-source-dirs: app
+  main-is: Main.hs
+  other-modules:
+    Config
+    Html.Dir
+    Html.List
+    Security
+    Urls
+  build-depends:
+    , base
+    , bytestring >=0.11 && <0.12
+    , directory >=1.3 && <1.4
+    , filepath >=1.4 && <1.5
+    , http-types >=0.12 && <0.13
+    , listdown
+    , lucid
+    , optparse-applicative >=0.16 && <0.18
+    , scotty >=0.12 && <0.13
+    , text
+  default-language: Haskell2010
+  ghc-options: -Wall -O2 -threaded -Wunticked-promoted-constructors
+
+test-suite test
+  hs-source-dirs: test
+  main-is: Main.hs
+  type: exitcode-stdio-1.0
+  build-depends:
+    , listdown
+    , base
+    -- , quickcheck-classes
+    -- , tasty
+    -- , tasty-hunit
+    -- , tasty-quickcheck
+  default-language: Haskell2010
+  ghc-options: -Wall -O2 -Wunticked-promoted-constructors
+
+benchmark bench
+  hs-source-dirs: bench
+  main-is: Main.hs
+  type: exitcode-stdio-1.0
+  build-depends:
+    , listdown
+    , base
+    , gauge
+  default-language: Haskell2010
+  ghc-options: -Wall -O2 -Wunticked-promoted-constructors

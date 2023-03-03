@@ -1,0 +1,11 @@
+server {
+  server_name ld.okuno.info;
+
+  access_log /var/log/nginx/listdown.access.log;
+  error_log /var/log/nginx/listdown.error.log;
+
+  location / {
+    proxy_pass http://localhost:7668;
+  }
+
+}
