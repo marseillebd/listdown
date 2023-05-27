@@ -47,6 +47,11 @@ button {
   line-height: 1.0;
 }
 
+/* List Shape */
+.listdown li {
+  list-style: "- ";
+}
+
 /* Textarea Shape */
 .listdown textarea {
   display: block;
@@ -55,6 +60,10 @@ button {
   height: 80vh;
   border-radius: 5px;
   border-bottom-right-radius: 0px;
+  /* these three are for disabiling word wrap */
+  white-space: pre;
+  overflow-wrap: normal;
+  overflow: scroll;
 }
 
 /* Save State Colors */

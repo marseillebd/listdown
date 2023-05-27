@@ -35,7 +35,6 @@ sudo chown okuno:www-data /var/lib/listdown
 sudo chown root:root etc/nginx/sites-available/*
 sudo mv etc/nginx/sites-available/* /etc/nginx/sites-available/
 sudo ln -s /etc/nginx/sites-available/ld.okuno.info /etc/nginx/sites-enabled/ld.okuno.info
-sudo chown root:root etc/nginx/sites-available/*
 sudo service nginx restart
 
 # move systemd service into place
@@ -47,3 +46,5 @@ sudo service listdown restart
 cd ~
 rmdir listdown/
 ```
+
+When deployed, the data is stored at `/var/lib/listdown/users`.

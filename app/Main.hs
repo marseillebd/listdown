@@ -11,8 +11,9 @@ module Main where
 import Security
 import Urls
 
-import Control.Monad.IO.Class (liftIO)
 import Config (Config(..), getConfig)
+import Control.Monad.IO.Class (liftIO)
+import Data.List (sort)
 import Listdown (runParser,fromTextFile,toTextFile)
 import System.Directory (doesDirectoryExist,createDirectoryIfMissing,listDirectory)
 import System.Directory (doesFileExist)
@@ -34,13 +35,22 @@ import qualified Web.Scotty as Scotty
 main :: IO ()
 main = do
   config <- getConfig
-  -- let config = Config
-  --       { port :: 3000
-  --       , usersRoot = "users" -- TODO
-  --       , staticDir = "app-web/static" -- TODO
-  --       }
   scotty config.port $ do
     ------ Lists ------
+    get listDirR $ do
+      let user = Me :: User 'Authd -- TODO
+      target <- listDirP
+      authListDirReadPerm config user target >>= \case
+        Nothing -> Scotty.raiseStatus Http.status403 $ "not authorized"
+        Just (Left permit) -> getDir permit
+        Just (Right permit) -> getList permit
+    post listDirR $ do
+      let user = Me :: User 'Authd -- TODO
+      target <- listP
+      authListDirWritePerm config user target >>= \case
+        Nothing -> Scotty.raiseStatus Http.status403 $ "not authorized"
+        Just (Left permit) -> putDir permit
+        Just (Right permit) -> putList permit
     get listR $ do
       let user = Me :: User 'Authd -- TODO
       target <- listP
@@ -63,6 +73,13 @@ main = do
         Nothing -> Scotty.raiseStatus Http.status403 $ "not authorized"
         Just permit -> pure permit
       getDir permit
+    post dirR $ do
+      let user = Me :: User 'Authd -- TODO
+      target <- dirP
+      permit <- case authDirWritePerm config user target of
+        Nothing -> Scotty.raiseStatus Http.status403 $ "not authorized"
+        Just permit -> pure permit
+      putDir permit
     ------ Static Files ------
     get "/static/:file" $ do
       file <- Scotty.param "file"
@@ -85,11 +102,14 @@ main = do
 
 ------ Lists ------
 
+doesListExist :: Permit 'Read 'ForList -> ActionM Bool
+doesListExist permit = liftIO $ doesFileExist permit.filepath
+
 getList :: Permit 'Read 'ForList -> ActionM ()
 getList permit = do
-  txt <- liftIO $ doesFileExist permit.filepath >>= \case
+  txt <- doesListExist permit >>= \case
     False -> pure ""
-    True -> T.readFile permit.filepath
+    True -> liftIO $ T.readFile permit.filepath
   case runParser $ fromTextFile txt of
     Left err -> Scotty.raiseStatus Http.status500 $
       "corrupt list: " <> (LT.pack . show) err
@@ -113,10 +133,19 @@ putList permit = do
 
 ------ Directories ------
 
+doesDirExist :: Permit a 'ForDir -> ActionM Bool
+doesDirExist permit = liftIO $ doesDirectoryExist permit.filepath
+
 getDir :: Permit 'Read 'ForDir -> ActionM ()
 getDir permit = do
-  children <- liftIO (doesDirectoryExist permit.filepath) >>= \case
+  children0 <- doesDirExist permit >>= \case
     False -> Scotty.raiseStatus Http.status404 "no such directory"
     True -> liftIO $ listDirectory permit.filepath
+  let children = sort children0
   Scotty.html $ Lucid.renderText $
     Html.directoryList permit children
+
+putDir :: Permit 'Write 'ForDir -> ActionM ()
+putDir permit = do
+  liftIO $ createDirectoryIfMissing True (permit.filepath)
+  getDir (demotePermsWriteToRead permit)

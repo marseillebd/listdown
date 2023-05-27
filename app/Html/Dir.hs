@@ -20,12 +20,13 @@ directoryList permit children = doctypehtml_ $ do
   head_ $ do
     meta_ [ charset_ "utf-8" ]
     title_ "Listdown"
+    meta_ [ name_ "viewport", content_ "width=device-width, initial-scale=1" ]
     link_ [ rel_ "stylesheet", href_ "/static/main.css" ]
   body_ $ do
     p_ $ do
       let trails = joinPath <$> inits (splitDirectories permit.urlpath)
       forM_ trails $ \trail -> do
-        a_ [href_ $ dirU permit.owner trail <> "/"] $ do
+        a_ [href_ $ dirU permit.owner trail] $ do
           toHtml $ case trail of
             "" -> "~" <> userPath permit.owner
             _ -> takeBaseName trail

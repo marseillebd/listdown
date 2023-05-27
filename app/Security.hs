@@ -18,10 +18,14 @@ module Security
   , listParentReadPerm
   , authDirReadPerm
   , authDirWritePerm
+  , authListDirReadPerm
+  , authListDirWritePerm
   ) where
 
 import Config (Config(..))
+import Control.Monad.IO.Class (MonadIO(..))
 import GHC.Records (HasField(..))
+import System.Directory (doesFileExist)
 import System.FilePath ((</>),(<.>),takeDirectory)
 import Web.Scotty (ActionM) -- TODO remove dependency on scotty
 
@@ -109,3 +113,27 @@ instance HasField "urlpath" (Permit any 'ForDir) FilePath where
 instance HasField "filepath" (Permit any 'ForDir) FilePath where
   getField (DirPermit config _ owner urlpath)
     = config.usersRoot </> userPath owner </> "lists" </> urlpath
+
+------------ Disambiguate List/Directory ------------
+
+authListDirReadPerm :: (MonadIO m)
+  => Config
+  -> User 'Authd
+  -> (User owner, FilePath)
+  -> m (Maybe (Either (Permit 'Read 'ForDir) (Permit 'Read 'ForList)))
+authListDirReadPerm config requester (owner, urlpath) = liftIO $ do
+  isFile <- doesFileExist (urlpath <.> "ld")
+  pure $ if isFile
+    then Right <$> authListReadPerm config requester (owner, urlpath)
+    else Left <$> authDirReadPerm config requester (owner, urlpath)
+
+authListDirWritePerm :: (MonadIO m)
+  => Config
+  -> User 'Authd
+  -> (User owner, FilePath)
+  -> m (Maybe (Either (Permit 'Write 'ForDir) (Permit 'Write 'ForList)))
+authListDirWritePerm config requester (owner, urlpath) = liftIO $ do
+  isFile <- doesFileExist (urlpath <.> "ld")
+  pure $ if isFile
+    then Right <$> authListWritePerm config requester (owner, urlpath)
+    else Left <$> authDirWritePerm config requester (owner, urlpath)
