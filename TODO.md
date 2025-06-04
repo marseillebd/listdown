@@ -1,0 +1,24 @@
+- server improvements
+  - [x] file browser
+    - [x] crumbs on dir and list pages
+    - [ ] alphabetize directory view
+  - [ ] add files
+- frontend improvements
+  - [x] auto-save
+  - [x] css that works on phones
+  - [x] read-based view (edit with monolithic text box
+  - [ ] tap list item to collapse
+  - [ ] drag list items to reorder
+    - [ ] extract listdown text from view mode
+  - [ ] double-tap list item to edit via textbox
+  - [ ] render richtext
+  - [ ] copy a list (and its children) to a temporary page, with option to save it elsewhere
+- data model
+  - [ ] links, esp. wikilinks
+  - [ ] id, status, and label parsing
+    - [ ] how to handle an item where the content starts with a link?
+      - The config should list the available statuses (probably with a non-empty default).
+        Then, only the given statuses in square brackets are recognized.
+        default config.status `status: ' ' = '', ?, ✓ = x`, ✗ = -`
+    - [ ] how to handle an item where the content has a colon in it?
+  - [ ] smart lists (i.e. just link to other list items based on criteria)
